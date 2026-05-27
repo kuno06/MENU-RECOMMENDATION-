@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>영의 양식 — 말씀이 먼저, 메뉴는 그 다음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Sunflower:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fef7e8;
+    --cream-deep: #f9ecc7;
+    --butter: #f4d35e;
+    --butter-deep: #e8b923;
+    --tomato: #e85d3a;
+    --tomato-deep: #c44021;
+    --basil: #5b8a3a;
+    --basil-deep: #3d6624;
+    --bread: #c68b5b;
+    --bread-deep: #8b5a30;
+    --ink: #2a1f15;
+    --ink-soft: #6b5a45;
+    --wheat: #fff8e3;
+    --shadow: rgba(139, 90, 48, 0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  body {
+    font-family: 'Sunflower', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .stage { display: none; min-height: 100vh; }
+  .stage.active { display: block; animation: stageIn 0.6s ease-out; }
+  @keyframes stageIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ GATE ============ */
+  .gate {
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background:
+      radial-gradient(circle at 30% 30%, var(--butter) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, var(--tomato) 0%, transparent 50%),
+      var(--cream);
+  }
+  .gate-emoji { font-size: 5rem; margin-bottom: 1.5rem; filter: drop-shadow(0 4px 12px var(--shadow)); }
+  .gate-tag {
+    background: var(--ink); color: var(--cream);
+    padding: 0.4rem 1.2rem; border-radius: 999px;
+    font-family: 'Jua', sans-serif; font-size: 0.9rem;
+    letter-spacing: 0.1em; margin-bottom: 1.5rem;
+  }
+  .gate-title {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    line-height: 1; color: var(--ink); margin-bottom: 1rem;
+  }
+  .gate-title .accent { color: var(--tomato); display: inline-block; transform: rotate(-3deg); }
+  .gate-sub {
+    font-family: 'Gaegu', sans-serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--ink-soft); max-width: 600px; margin-bottom: 2.5rem;
+  }
+  .verse-box {
+    background: white; padding: 1.8rem 2rem; border-radius: 18px;
+    border: 3px solid var(--butter); max-width: 550px; margin-bottom: 2.5rem;
+    box-shadow: 6px 6px 0 var(--ink); transform: rotate(-1deg);
+  }
+  .verse-box p { font-weight: 500; color: var(--ink); font-size: 1.05rem; line-height: 1.6; }
+  .verse-box cite {
+    display: block; margin-top: 0.8rem;
+    font-family: 'Jua', sans-serif; color: var(--tomato-deep);
+    font-style: normal; font-size: 0.95rem;
+  }
+  .gate-form {
+    background: white; padding: 2rem 2rem 2.5rem; border-radius: 20px;
+    max-width: 480px; width: 100%;
+    box-shadow: 0 12px 32px var(--shadow); border: 2px solid var(--ink);
+  }
+  .gate-form h3 { font-family: 'Jua', sans-serif; font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--ink); }
+  .gf-field { margin-bottom: 1rem; text-align: left; }
+  .gf-field label {
+    display: block; font-family: 'Gaegu', sans-serif;
+    color: var(--ink-soft); margin-bottom: 0.4rem; font-size: 1rem; font-weight: 700;
+  }
+  .gf-field input, .gf-field select {
+    width: 100%; padding: 0.9rem 1rem;
+    background: var(--cream); border: 2px solid var(--cream-deep);
+    border-radius: 10px; font-family: 'Sunflower', sans-serif;
+    font-weight: 500; font-size: 1rem; color: var(--ink);
+    transition: border-color 0.2s;
+  }
+  .gf-field input:focus, .gf-field select:focus { outline: none; border-color: var(--tomato); }
+  .btn-bread {
+    background: var(--tomato); color: white; border: none;
+    padding: 1.1rem 2rem; border-radius: 999px;
+    font-family: 'Jua', sans-serif; font-size: 1.2rem;
+    cursor: pointer; width: 100%; margin-top: 1rem;
+    box-shadow: 0 6px 0 var(--tomato-deep); transition: all 0.15s;
+  }
+  .btn-bread:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--tomato-deep); }
+  .btn-bread:active { transform: translateY(6px); box-shadow: 0 0 0 var(--tomato-deep); }
+
+  /* ============ QUIZ ============ */
+  .quiz-stage {
+    min-height: 100vh; padding: 2rem 1.5rem; background: var(--wheat);
+    background-image:
+      radial-gradient(circle at 5% 5%, var(--cream-deep) 2px, transparent 2px),
+      radial-gradient(circle at 25% 25%, var(--cream-deep) 2px, transparent 2px);
+    background-size: 50px 50px;
+  }
+  .quiz-wrap { max-width: 700px; margin: 0 auto; }
+  .quiz-header { text-align: center; margin-bottom: 2rem; }
+  .quiz-header .crumb {
+    display: inline-block; background: var(--ink); color: var(--cream);
+    padding: 0.3rem 1rem; border-radius: 999px;
+    font-family: 'Jua', sans-serif; font-size: 0.85rem; margin-bottom: 1rem;
+  }
+  .quiz-header h2 {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    color: var(--ink); margin-bottom: 0.5rem;
+  }
+  .quiz-header p { font-family: 'Gaegu', sans-serif; color: var(--ink-soft); font-size: 1.1rem; }
+  .progress-bread {
+    display: flex; justify-content: center; gap: 1rem; margin: 1.5rem 0 2rem;
+  }
+  .bread-slot {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: var(--cream-deep); border: 3px solid var(--bread);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; transition: all 0.4s; opacity: 0.4;
+  }
+  .bread-slot.correct { background: var(--basil); border-color: var(--basil-deep); opacity: 1; transform: scale(1.1); }
+  .bread-slot.wrong { background: var(--tomato); border-color: var(--tomato-deep); opacity: 1; animation: shake 0.4s; }
+  .bread-slot.current { opacity: 1; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+  .quiz-card {
+    background: white; border: 3px solid var(--ink);
+    border-radius: 20px; padding: 2.5rem 2rem;
+    box-shadow: 8px 8px 0 var(--butter); position: relative;
+  }
+  .quiz-num {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    background: var(--butter); color: var(--ink);
+    padding: 0.3rem 1.5rem; border-radius: 999px;
+    font-family: 'Jua', sans-serif; border: 3px solid var(--ink); font-size: 0.95rem;
+  }
+  .quiz-question {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(1.3rem, 3.5vw, 1.7rem);
+    color: var(--ink); line-height: 1.4; margin: 1rem 0 1.5rem; text-align: center;
+  }
+  .quiz-hint { font-family: 'Gaegu', sans-serif; color: var(--tomato-deep); font-size: 1rem; text-align: center; margin-bottom: 1.5rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.8rem; }
+  .quiz-opt {
+    padding: 1.1rem 1.3rem; background: var(--cream);
+    border: 2.5px solid var(--cream-deep); border-radius: 14px;
+    cursor: pointer; font-family: 'Sunflower', sans-serif;
+    font-weight: 500; font-size: 1.05rem; text-align: left;
+    transition: all 0.2s; color: var(--ink);
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--tomato); transform: translateX(4px); }
+  .quiz-opt.selected { background: var(--butter); border-color: var(--ink); }
+  .quiz-opt.correct { background: var(--basil); color: white; border-color: var(--basil-deep); }
+  .quiz-opt.wrong { background: var(--tomato); color: white; border-color: var(--tomato-deep); }
+  .quiz-opt:disabled { cursor: default; }
+
+  .quiz-feedback {
+    display: none; margin-top: 1.5rem; padding: 1.2rem;
+    border-radius: 12px; text-align: center;
+    font-family: 'Gaegu', sans-serif; font-size: 1.1rem;
+  }
+  .quiz-feedback.correct { display: block; background: #e8f3df; color: var(--basil-deep); border: 2px solid var(--basil); }
+  .quiz-feedback.wrong { display: block; background: #fde2dc; color: var(--tomato-deep); border: 2px solid var(--tomato); }
+  .quiz-feedback strong { font-family: 'Jua', sans-serif; }
+  .quiz-next-btn {
+    background: var(--basil); color: white; border: none;
+    padding: 1rem 2.5rem; border-radius: 999px;
+    font-family: 'Jua', sans-serif; font-size: 1.1rem;
+    cursor: pointer; margin-top: 1.5rem;
+    box-shadow: 0 5px 0 var(--basil-deep); transition: all 0.15s;
+  }
+  .quiz-next-btn:hover { transform: translateY(2px); box-shadow: 0 3px 0 var(--basil-deep); }
+
+  /* ============ MENU ============ */
+  .menu-stage { min-height: 100vh; padding: 2rem 1.5rem; background: var(--cream); }
+  .menu-wrap { max-width: 800px; margin: 0 auto; }
+  .menu-header { text-align: center; margin-bottom: 2rem; }
+  .menu-header .tag {
+    background: var(--basil); color: white;
+    padding: 0.3rem 1rem; border-radius: 999px;
+    font-family: 'Jua', sans-serif; font-size: 0.9rem;
+    display: inline-block; margin-bottom: 1rem;
+    box-shadow: 0 3px 0 var(--basil-deep);
+  }
+  .menu-header h2 {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--ink); line-height: 1.1;
+  }
+  .menu-header p { font-family: 'Gaegu', sans-serif; color: var(--ink-soft); font-size: 1.15rem; margin-top: 0.5rem; }
+
+  .menu-card {
+    background: white; padding: 2rem; border-radius: 20px;
+    margin-bottom: 1.5rem; box-shadow: 0 6px 20px var(--shadow);
+    border: 2px solid var(--cream-deep);
+  }
+  .menu-card h3 {
+    font-family: 'Jua', sans-serif; font-size: 1.4rem;
+    color: var(--ink); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .menu-card h3::before { content: ''; width: 5px; height: 22px; background: var(--tomato); border-radius: 3px; }
+
+  .meal-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .meal-tab {
+    flex: 1; min-width: 100px; padding: 0.8rem 1rem;
+    background: var(--cream); border: 2px solid var(--cream-deep);
+    border-radius: 12px; cursor: pointer;
+    font-family: 'Jua', sans-serif; font-size: 0.95rem;
+    color: var(--ink-soft); text-align: center; transition: all 0.2s;
+  }
+  .meal-tab:hover { border-color: var(--tomato); }
+  .meal-tab.active { background: var(--tomato); color: white; border-color: var(--tomato-deep); }
+
+  .menu-options {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem;
+  }
+  .menu-opt {
+    padding: 1rem 0.5rem; background: var(--cream);
+    border: 2.5px solid var(--cream-deep); border-radius: 14px;
+    cursor: pointer; font-family: 'Sunflower', sans-serif;
+    font-weight: 500; font-size: 0.95rem; text-align: center;
+    transition: all 0.2s; position: relative; color: var(--ink);
+  }
+  .menu-opt .emoji { display: block; font-size: 2rem; margin-bottom: 0.3rem; }
+  .menu-opt:hover { border-color: var(--tomato); transform: translateY(-2px); }
+  .menu-opt.selected {
+    background: var(--butter); border-color: var(--ink);
+    transform: translateY(-2px); box-shadow: 0 5px 0 var(--butter-deep);
+  }
+  .menu-opt.selected::after {
+    content: '✓'; position: absolute;
+    top: -8px; right: -8px; width: 26px; height: 26px;
+    background: var(--basil); color: white; border-radius: 50%;
+    font-family: 'Jua', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white;
+  }
+
+  .allergy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.6rem; }
+  .allergy-chip {
+    padding: 0.6rem 0.5rem; background: var(--cream);
+    border: 2px solid var(--cream-deep); border-radius: 999px;
+    cursor: pointer; font-family: 'Sunflower', sans-serif;
+    font-size: 0.9rem; text-align: center; transition: all 0.2s;
+  }
+  .allergy-chip.selected { background: var(--tomato); color: white; border-color: var(--tomato-deep); }
+
+  .free-input {
+    width: 100%; padding: 1rem;
+    background: var(--cream); border: 2px solid var(--cream-deep);
+    border-radius: 12px; font-family: 'Sunflower', sans-serif;
+    font-size: 1rem; color: var(--ink); resize: vertical; min-height: 80px;
+  }
+  .free-input:focus { outline: none; border-color: var(--tomato); }
+
+  /* ============ DONE ============ */
+  .done-stage {
+    min-height: 100vh; padding: 3rem 1.5rem;
+    background:
+      radial-gradient(circle at 20% 20%, var(--butter) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, var(--basil) 0%, transparent 40%),
+      var(--cream);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+  }
+  .done-emoji { font-size: 5rem; margin-bottom: 1rem; animation: bounce 1s ease-in-out infinite; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .done-title { font-family: 'Jua', sans-serif; font-size: clamp(2rem, 6vw, 3.5rem); color: var(--ink); margin-bottom: 1rem; }
+  .done-sub { font-family: 'Gaegu', sans-serif; font-size: 1.3rem; color: var(--ink-soft); max-width: 500px; margin-bottom: 2rem; }
+  .done-verse {
+    background: white; padding: 1.5rem 2rem; border-radius: 16px;
+    border: 3px solid var(--basil); max-width: 500px; margin-bottom: 2rem;
+    box-shadow: 6px 6px 0 var(--ink); transform: rotate(1deg);
+  }
+  .done-verse p { font-weight: 500; }
+  .done-verse cite { display: block; margin-top: 0.6rem; font-family: 'Jua', sans-serif; color: var(--basil-deep); font-style: normal; font-size: 0.9rem; }
+
+  /* ============ LEADER ============ */
+  .leader-stage { min-height: 100vh; padding: 2rem 1.5rem; background: var(--wheat); }
+  .leader-wrap { max-width: 1200px; margin: 0 auto; }
+  .leader-header { background: var(--ink); color: var(--cream); padding: 2rem; border-radius: 20px; margin-bottom: 1.5rem; }
+  .leader-header h2 { font-family: 'Jua', sans-serif; font-size: 1.8rem; }
+  .leader-header p { font-family: 'Gaegu', sans-serif; margin-top: 0.5rem; color: var(--cream-deep); }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat-bx { background: white; padding: 1.5rem; border-radius: 14px; text-align: center; border: 2px solid var(--cream-deep); }
+  .stat-bx .num { font-family: 'Jua', sans-serif; font-size: 2.5rem; line-height: 1; color: var(--tomato); }
+  .stat-bx .lbl { font-family: 'Gaegu', sans-serif; color: var(--ink-soft); margin-top: 0.5rem; }
+  .ranking-section { background: white; padding: 2rem; border-radius: 18px; margin-bottom: 1.5rem; border: 2px solid var(--cream-deep); }
+  .ranking-section h3 { font-family: 'Jua', sans-serif; font-size: 1.4rem; margin-bottom: 1.2rem; color: var(--ink); }
+  .meal-section-title { font-family: 'Jua', sans-serif; color: var(--tomato); margin: 1.2rem 0 0.6rem; padding-bottom: 0.4rem; border-bottom: 2px dashed var(--cream-deep); }
+  .rank-row { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 0; }
+  .rank-num {
+    font-family: 'Jua', sans-serif; background: var(--butter); color: var(--ink);
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; border: 2px solid var(--ink);
+  }
+  .rank-num.top { background: var(--tomato); color: white; }
+  .rank-name { flex: 1; font-family: 'Sunflower', sans-serif; font-weight: 500; }
+  .rank-bar-wrap { flex: 1.5; height: 14px; background: var(--cream); border-radius: 999px; overflow: hidden; max-width: 200px; }
+  .rank-bar { height: 100%; background: linear-gradient(90deg, var(--tomato) 0%, var(--butter) 100%); transition: width 0.8s; border-radius: 999px; }
+  .rank-count { font-family: 'Jua', sans-serif; color: var(--ink); min-width: 30px; text-align: right; }
+
+  .allergy-list { display: grid; gap: 0.6rem; }
+  .allergy-row { background: var(--cream); padding: 0.8rem 1rem; border-radius: 10px; display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; }
+  .allergy-row .nm { font-family: 'Sunflower', sans-serif; font-weight: 700; }
+  .allergy-row .meta { font-family: 'Gaegu', sans-serif; color: var(--ink-soft); font-size: 0.9rem; }
+  .allergy-row .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .allergy-row .tag { background: var(--tomato); color: white; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.8rem; }
+
+  .opinions-list { display: grid; gap: 0.8rem; }
+  .opinion-row { background: var(--cream); padding: 1rem 1.2rem; border-radius: 10px; border-left: 4px solid var(--basil); }
+  .opinion-row .who { font-family: 'Gaegu', sans-serif; font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 0.3rem; }
+  .opinion-row .what { font-family: 'Sunflower', sans-serif; color: var(--ink); }
+
+  .leader-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0; }
+  .lact-btn { padding: 0.8rem 1.5rem; background: white; border: 2px solid var(--ink); border-radius: 999px; cursor: pointer; font-family: 'Jua', sans-serif; font-size: 0.95rem; }
+  .lact-btn:hover { background: var(--ink); color: var(--cream); }
+  .lact-btn.danger { border-color: var(--tomato); color: var(--tomato); }
+  .lact-btn.danger:hover { background: var(--tomato); color: white; }
+
+  .empty-msg { text-align: center; padding: 2rem; color: var(--ink-soft); font-family: 'Gaegu', sans-serif; font-style: italic; }
+
+  /* ============ 공통 ============ */
+  .top-bar { position: fixed; top: 1rem; right: 1rem; z-index: 100; display: flex; gap: 0.5rem; }
+  .role-btn {
+    background: rgba(42, 31, 21, 0.85); color: var(--cream); border: none;
+    padding: 0.5rem 1rem; border-radius: 999px;
+    font-family: 'Jua', sans-serif; font-size: 0.85rem; cursor: pointer;
+    backdrop-filter: blur(8px);
+  }
+  .role-btn:hover { background: var(--ink); }
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink); color: var(--cream);
+    padding: 1rem 2rem; border-radius: 999px;
+    box-shadow: 0 8px 24px var(--shadow); z-index: 1000;
+    opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Jua', sans-serif;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="role-btn" onclick="switchToStudent()" id="role-student" style="display:none;">👤 학생 화면</button>
+  <button class="role-btn" onclick="switchToLeader()" id="role-leader">👨‍🏫 리더 화면</button>
+</div>
+
+<!-- 1. GATE -->
+<div class="stage active" id="stage-gate">
+  <div class="gate">
+    <div class="gate-emoji">🍞</div>
+    <div class="gate-tag">SPIRITUAL FOOD FIRST</div>
+    <h1 class="gate-title">영의 양식이 <span class="accent">먼저!</span></h1>
+    <p class="gate-sub">먹고 싶은 메뉴를 추천하기 전에<br>말씀 한 조각부터 떼어먹어요</p>
+    <div class="verse-box">
+      <p>"사람이 떡으로만 살 것이 아니요<br>하나님의 입으로부터 나오는<br>모든 말씀으로 살 것이라"</p>
+      <cite>— 마태복음 4장 4절</cite>
+    </div>
+    <div class="gate-form">
+      <h3>🍽️ 나를 알려주세요</h3>
+      <div class="gf-field">
+        <label>이름</label>
+        <input type="text" id="g-name" placeholder="예: 홍길동" maxlength="20">
+      </div>
+      <div class="gf-field">
+        <label>학년</label>
+        <select id="g-grade">
+          <option value="">선택</option>
+          <option value="중1">중1</option>
+          <option value="중2">중2</option>
+          <option value="중3">중3</option>
+          <option value="고1">고1</option>
+          <option value="고2">고2</option>
+          <option value="고3">고3</option>
+        </select>
+      </div>
+      <button class="btn-bread" onclick="startQuiz()">🥖 말씀의 식탁으로!</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. QUIZ -->
+<div class="stage" id="stage-quiz">
+  <div class="quiz-stage">
+    <div class="quiz-wrap">
+      <div class="quiz-header">
+        <div class="crumb">🍞 영의 양식 단계</div>
+        <h2>말씀 퀴즈 3문제</h2>
+        <p>3문제 모두 맞히면 메뉴 추천 식탁이 열려요!</p>
+      </div>
+      <div class="progress-bread" id="progress-bread">
+        <div class="bread-slot current">🍞</div>
+        <div class="bread-slot">🍞</div>
+        <div class="bread-slot">🍞</div>
+      </div>
+      <div id="quiz-card-area"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. MENU -->
+<div class="stage" id="stage-menu">
+  <div class="menu-stage">
+    <div class="menu-wrap">
+      <div class="menu-header">
+        <div class="tag">✓ 영의 양식 통과!</div>
+        <h2>이제 진짜 식탁이에요</h2>
+        <p>먹고 싶은 메뉴를 골라주세요 🍽️</p>
+      </div>
+      <div class="menu-card">
+        <h3>🍱 어느 끼니의 메뉴인가요?</h3>
+        <div class="meal-tabs" id="meal-tabs">
+          <button class="meal-tab active" data-meal="아침">🌅 아침</button>
+          <button class="meal-tab" data-meal="점심">☀️ 점심</button>
+          <button class="meal-tab" data-meal="저녁">🌙 저녁</button>
+          <button class="meal-tab" data-meal="간식">🍪 간식</button>
+        </div>
+      </div>
+      <div class="menu-card">
+        <h3>🍴 먹고 싶은 메뉴 (여러 개 선택 가능)</h3>
+        <div class="menu-options" id="menu-options"></div>
+      </div>
+      <div class="menu-card">
+        <h3>🚨 알레르기·못 먹는 것</h3>
+        <div class="allergy-grid" id="allergy-grid">
+          <div class="allergy-chip" data-allergy="없음">없어요 😊</div>
+          <div class="allergy-chip" data-allergy="땅콩">땅콩</div>
+          <div class="allergy-chip" data-allergy="우유">우유·유제품</div>
+          <div class="allergy-chip" data-allergy="계란">계란</div>
+          <div class="allergy-chip" data-allergy="밀가루">밀가루</div>
+          <div class="allergy-chip" data-allergy="갑각류">갑각류</div>
+          <div class="allergy-chip" data-allergy="견과류">견과류</div>
+          <div class="allergy-chip" data-allergy="복숭아">복숭아</div>
+          <div class="allergy-chip" data-allergy="돼지고기">돼지고기</div>
+          <div class="allergy-chip" data-allergy="매운것">매운 것 못 먹음</div>
+        </div>
+      </div>
+      <div class="menu-card">
+        <h3>💬 하고 싶은 말 (선택)</h3>
+        <textarea class="free-input" id="free-text" maxlength="300" placeholder="예) 비빔밥 또 먹으면 안돼요! / 떡볶이는 꼭! / 채식 가능한 메뉴 부탁드려요"></textarea>
+      </div>
+      <button class="btn-bread" onclick="submitMenu()" style="background:var(--basil); box-shadow:0 6px 0 var(--basil-deep);">🍽️ 제출하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. DONE -->
+<div class="stage" id="stage-done">
+  <div class="done-stage">
+    <div class="done-emoji">🎉</div>
+    <h2 class="done-title">잘 차려진 식탁!</h2>
+    <p class="done-sub" id="done-name"></p>
+    <div class="done-verse">
+      <p>"먹든지 마시든지 무엇을 하든지<br>다 하나님의 영광을 위하여 하라"</p>
+      <cite>— 고린도전서 10:31</cite>
+    </div>
+    <button class="btn-bread" onclick="resetGame()" style="max-width:400px;">🔄 다른 사람도 참여하기</button>
+  </div>
+</div>
+
+<!-- 5. LEADER -->
+<div class="stage" id="stage-leader">
+  <div class="leader-stage">
+    <div class="leader-wrap">
+      <div class="leader-header">
+        <h2>👨‍🏫 리더 식단 정리표</h2>
+        <p>학생들이 영의 양식을 떼어먹고 추천한 메뉴들이에요</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-bx"><div class="num" id="ls-total">0</div><div class="lbl">총 응답</div></div>
+        <div class="stat-bx"><div class="num" id="ls-allergy">0</div><div class="lbl">알레르기 있음</div></div>
+        <div class="stat-bx"><div class="num" id="ls-opinion">0</div><div class="lbl">의견 남김</div></div>
+        <div class="stat-bx"><div class="num" id="ls-quiz">0</div><div class="lbl">평균 시도횟수</div></div>
+      </div>
+      <div class="ranking-section">
+        <h3>🏆 메뉴 인기 순위</h3>
+        <div id="ranking-content"></div>
+      </div>
+      <div class="ranking-section">
+        <h3>🚨 알레르기 명단</h3>
+        <div id="allergy-content"></div>
+      </div>
+      <div class="ranking-section">
+        <h3>💬 학생들의 의견</h3>
+        <div id="opinions-content"></div>
+      </div>
+      <div class="leader-actions">
+        <button class="lact-btn" onclick="exportCSV()">📥 CSV 내보내기</button>
+        <button class="lact-btn danger" onclick="clearAll()">🗑️ 전체 초기화</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const MENUS = {
+    '아침': [
+      { emoji: '🍚', name: '한식 백반' },
+      { emoji: '🍞', name: '토스트·계란' },
+      { emoji: '🥣', name: '시리얼' },
+      { emoji: '🥪', name: '샌드위치' },
+      { emoji: '🍙', name: '주먹밥' },
+      { emoji: '🥞', name: '팬케이크' },
+      { emoji: '🍳', name: '계란말이' },
+      { emoji: '🥛', name: '간단히' }
+    ],
+    '점심': [
+      { emoji: '🍱', name: '제육볶음' },
+      { emoji: '🍛', name: '카레라이스' },
+      { emoji: '🍜', name: '잔치국수' },
+      { emoji: '🥘', name: '닭갈비' },
+      { emoji: '🍲', name: '김치찌개' },
+      { emoji: '🍝', name: '스파게티' },
+      { emoji: '🥩', name: '불고기' },
+      { emoji: '🍔', name: '햄버거' },
+      { emoji: '🍕', name: '피자' },
+      { emoji: '🍗', name: '치킨' }
+    ],
+    '저녁': [
+      { emoji: '🥩', name: '바베큐' },
+      { emoji: '🍖', name: '삼겹살' },
+      { emoji: '🍲', name: '부대찌개' },
+      { emoji: '🥘', name: '닭볶음탕' },
+      { emoji: '🍣', name: '회·초밥' },
+      { emoji: '🍤', name: '돈까스' },
+      { emoji: '🌭', name: '핫도그' },
+      { emoji: '🍗', name: '치킨' },
+      { emoji: '🍕', name: '피자' },
+      { emoji: '🥟', name: '만두·중식' }
+    ],
+    '간식': [
+      { emoji: '🍪', name: '쿠키' },
+      { emoji: '🧁', name: '컵케이크' },
+      { emoji: '🍦', name: '아이스크림' },
+      { emoji: '🍩', name: '도넛' },
+      { emoji: '🍫', name: '초콜릿' },
+      { emoji: '🍿', name: '팝콘' },
+      { emoji: '🥤', name: '음료수' },
+      { emoji: '🥨', name: '과자류' },
+      { emoji: '🍇', name: '과일' },
+      { emoji: '🍡', name: '떡' }
+    ]
+  };
+
+  const QUIZ_POOL = [
+    { q: '예수님이 광야에서 40일간 금식하실 때 무엇으로 사단의 시험을 이기셨나요?', hint: '마태복음 4장', opts: ['천사들의 도움으로', '하나님의 말씀으로', '기적으로', '기도만으로'], answer: 1 },
+    { q: '예수님은 자신을 무엇이라 하셨나요? "나는 ___의 떡이니"', hint: '요한복음 6장', opts: ['땅', '생명', '천국', '하늘'], answer: 1 },
+    { q: '오병이어 기적에서 사용된 음식은?', hint: '한 어린이가 가져온 것', opts: ['빵 10개와 생선 2마리', '빵 5개와 생선 2마리', '빵 7개와 생선 5마리', '빵 5개와 생선 5마리'], answer: 1 },
+    { q: '"먹든지 마시든지 무엇을 하든지 다 ___을 위하여 하라"의 빈칸은?', hint: '고린도전서 10장 31절', opts: ['교회', '하나님의 영광', '이웃', '평화'], answer: 1 },
+    { q: '광야의 이스라엘 백성이 하늘에서 받아 먹은 음식은?', hint: '40년 동안 먹었어요', opts: ['만나', '메추라기', '꿀', '둘 다 (만나와 메추라기)'], answer: 3 },
+    { q: '"여호와는 나의 ___이시니 내게 부족함이 없으리로다"', hint: '시편 23편', opts: ['아버지', '왕', '목자', '구원'], answer: 2 },
+    { q: '예수님께서 잡히시던 밤, 제자들과 나누신 식사는?', hint: '성찬의 시작', opts: ['추수감사 식사', '최후의 만찬', '유월절 식사', '최후의 만찬 (유월절 식사)'], answer: 3 },
+    { q: '잃은 아들이 돌아왔을 때 아버지가 잡으신 동물은?', hint: '누가복음 15장', opts: ['양', '염소', '살진 송아지', '돼지'], answer: 2 },
+    { q: '엘리야 선지자에게 까마귀가 가져다 준 것은?', hint: '시냇가에 숨어있을 때', opts: ['물과 빵', '떡과 고기', '과일', '메추라기'], answer: 1 },
+    { q: '예수님이 부활하신 후 제자들에게 구워주신 음식은?', hint: '디베랴 호숫가', opts: ['빵', '생선', '빵과 생선', '양고기'], answer: 2 },
+    { q: '"수고하고 무거운 짐 진 자들아 다 내게로 오라 내가 너희를 ___ 하리라"', hint: '마태복음 11장', opts: ['축복', '치료', '쉬게', '구원'], answer: 2 },
+    { q: '다니엘과 세 친구들이 왕의 진미 대신 먹은 것은?', hint: '다니엘 1장', opts: ['빵과 물', '채소와 물', '과일과 우유', '꿀과 메뚜기'], answer: 1 },
+    { q: '세례 요한이 광야에서 먹은 음식은?', hint: '특이한 식단', opts: ['빵과 양고기', '메뚜기와 석청', '물고기와 빵', '채소와 견과류'], answer: 1 },
+    { q: '"하나님의 나라는 먹는 것과 마시는 것이 아니요 오직 성령 안에서 ___과 ___과 ___이라"', hint: '로마서 14장 17절', opts: ['믿음·소망·사랑', '의·평강·희락', '진리·정의·자비', '기도·찬송·감사'], answer: 1 },
+    { q: '예수님이 사마리아 여인에게 약속하신 것은?', hint: '요한복음 4장', opts: ['새로운 우물', '영생하도록 솟아나는 샘물', '풍성한 음식', '치유'], answer: 1 }
+  ];
+
+  const STORAGE_KEY = 'spiritualFood_responses';
+  let userName = '';
+  let userGrade = '';
+  let currentQuestions = [];
+  let currentQuizIdx = 0;
+  let quizAttempts = 1;
+  let answered = false;
+  let currentMeal = '아침';
+  let selectedMenus = {};
+  let selectedAllergies = [];
+
+  function showStage(id) {
+    document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function switchToLeader() {
+    showStage('stage-leader');
+    document.getElementById('role-leader').style.display = 'none';
+    document.getElementById('role-student').style.display = 'block';
+    renderLeader();
+  }
+  function switchToStudent() {
+    document.getElementById('role-leader').style.display = 'block';
+    document.getElementById('role-student').style.display = 'none';
+    resetGame();
+  }
+
+  function startQuiz() {
+    const name = document.getElementById('g-name').value.trim();
+    const grade = document.getElementById('g-grade').value;
+    if (!name) { showToast('이름을 적어주세요'); return; }
+    if (!grade) { showToast('학년을 선택해주세요'); return; }
+    userName = name;
+    userGrade = grade;
+    currentQuestions = [...QUIZ_POOL].sort(() => Math.random() - 0.5).slice(0, 3);
+    currentQuizIdx = 0;
+    quizAttempts = 1;
+    showStage('stage-quiz');
+    renderQuiz();
+  }
+
+  function renderQuiz() {
+    const slots = document.querySelectorAll('.bread-slot');
+    slots.forEach((slot, i) => {
+      slot.className = 'bread-slot';
+      if (i < currentQuizIdx) slot.classList.add('correct');
+      else if (i === currentQuizIdx) slot.classList.add('current');
+    });
+
+    const q = currentQuestions[currentQuizIdx];
+    answered = false;
+    const area = document.getElementById('quiz-card-area');
+    area.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-num">문제 ${currentQuizIdx + 1} / 3</div>
+        <div class="quiz-question">${escapeHtml(q.q)}</div>
+        <div class="quiz-hint">💡 ${escapeHtml(q.hint)}</div>
+        <div class="quiz-options">
+          ${q.opts.map((opt, i) => `
+            <button class="quiz-opt" onclick="selectAnswer(${i})" id="opt-${i}">${escapeHtml(opt)}</button>
+          `).join('')}
+        </div>
+        <div id="quiz-feedback"></div>
+        <div id="quiz-next-area" style="text-align:center;"></div>
+      </div>
+    `;
+  }
+
+  function selectAnswer(idx) {
+    if (answered) return;
+    answered = true;
+    const q = currentQuestions[currentQuizIdx];
+    const isCorrect = idx === q.answer;
+
+    document.querySelectorAll('.quiz-opt').forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add('correct');
+      else if (i === idx) btn.classList.add('wrong');
+    });
+
+    const feedback = document.getElementById('quiz-feedback');
+    const slots = document.querySelectorAll('.bread-slot');
+
+    if (isCorrect) {
+      slots[currentQuizIdx].classList.remove('current');
+      slots[currentQuizIdx].classList.add('correct');
+      feedback.className = 'quiz-feedback correct';
+      feedback.innerHTML = `<strong>🎉 정답!</strong> 한 조각의 빵을 떼어 먹었어요`;
+      const nextArea = document.getElementById('quiz-next-area');
+      if (currentQuizIdx === 2) {
+        nextArea.innerHTML = `<button class="quiz-next-btn" onclick="passToMenu()">🍽️ 식탁으로 가기 →</button>`;
+      } else {
+        nextArea.innerHTML = `<button class="quiz-next-btn" onclick="nextQuiz()">다음 문제 →</button>`;
+      }
+    } else {
+      slots[currentQuizIdx].classList.remove('current');
+      slots[currentQuizIdx].classList.add('wrong');
+      feedback.className = 'quiz-feedback wrong';
+      feedback.innerHTML = `<strong>아쉬워요!</strong> 정답은 "${escapeHtml(q.opts[q.answer])}"였어요. 처음부터 다시 도전해볼까요?`;
+      const nextArea = document.getElementById('quiz-next-area');
+      nextArea.innerHTML = `<button class="quiz-next-btn" onclick="retryQuiz()" style="background:var(--tomato); box-shadow:0 5px 0 var(--tomato-deep);">🔄 다시 도전!</button>`;
+    }
+  }
+
+  function nextQuiz() {
+    currentQuizIdx++;
+    renderQuiz();
+  }
+
+  function retryQuiz() {
+    quizAttempts++;
+    currentQuestions = [...QUIZ_POOL].sort(() => Math.random() - 0.5).slice(0, 3);
+    currentQuizIdx = 0;
+    renderQuiz();
+  }
+
+  function passToMenu() {
+    showStage('stage-menu');
+    renderMenuOptions();
+  }
+
+  document.querySelectorAll('.meal-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.meal-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentMeal = tab.dataset.meal;
+      renderMenuOptions();
+    };
+  });
+
+  function renderMenuOptions() {
+    const grid = document.getElementById('menu-options');
+    const menus = MENUS[currentMeal] || [];
+    const selected = selectedMenus[currentMeal] || [];
+    grid.innerHTML = menus.map(m => `
+      <button class="menu-opt ${selected.includes(m.name) ? 'selected' : ''}" onclick="toggleMenu('${escapeJs(m.name)}')">
+        <span class="emoji">${m.emoji}</span>
+        ${escapeHtml(m.name)}
+      </button>
+    `).join('');
+  }
+
+  function toggleMenu(name) {
+    if (!selectedMenus[currentMeal]) selectedMenus[currentMeal] = [];
+    const idx = selectedMenus[currentMeal].indexOf(name);
+    if (idx >= 0) selectedMenus[currentMeal].splice(idx, 1);
+    else selectedMenus[currentMeal].push(name);
+    renderMenuOptions();
+  }
+
+  document.querySelectorAll('.allergy-chip').forEach(chip => {
+    chip.onclick = () => {
+      const val = chip.dataset.allergy;
+      if (val === '없음') {
+        const wasSelected = chip.classList.contains('selected');
+        document.querySelectorAll('.allergy-chip').forEach(c => c.classList.remove('selected'));
+        if (!wasSelected) {
+          chip.classList.add('selected');
+          selectedAllergies = ['없음'];
+        } else {
+          selectedAllergies = [];
+        }
+      } else {
+        const noneChip = document.querySelector('.allergy-chip[data-allergy="없음"]');
+        noneChip.classList.remove('selected');
+        selectedAllergies = selectedAllergies.filter(a => a !== '없음');
+        if (chip.classList.contains('selected')) {
+          chip.classList.remove('selected');
+          selectedAllergies = selectedAllergies.filter(a => a !== val);
+        } else {
+          chip.classList.add('selected');
+          selectedAllergies.push(val);
+        }
+      }
+    };
+  });
+
+  function submitMenu() {
+    const totalMenus = Object.values(selectedMenus).flat().length;
+    if (totalMenus === 0) { showToast('적어도 메뉴 하나는 골라주세요!'); return; }
+    if (selectedAllergies.length === 0) { showToast('알레르기 항목을 체크해주세요 (없으면 "없어요" 선택)'); return; }
+
+    const responses = loadResponses();
+    responses.push({
+      id: 'r-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      name: userName,
+      grade: userGrade,
+      menus: { ...selectedMenus },
+      allergies: [...selectedAllergies],
+      opinion: document.getElementById('free-text').value.trim(),
+      quizAttempts,
+      submittedAt: Date.now()
+    });
+    saveResponses(responses);
+
+    document.getElementById('done-name').innerHTML = `<strong>${escapeHtml(userName)}</strong>님의 추천 잘 받았어요!<br>리더가 모든 의견을 보고 식단을 짤 거예요.`;
+    showStage('stage-done');
+  }
+
+  function resetGame() {
+    userName = '';
+    userGrade = '';
+    currentQuestions = [];
+    currentQuizIdx = 0;
+    quizAttempts = 1;
+    selectedMenus = {};
+    selectedAllergies = [];
+    document.getElementById('g-name').value = '';
+    document.getElementById('g-grade').value = '';
+    document.getElementById('free-text').value = '';
+    document.querySelectorAll('.meal-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+    document.querySelectorAll('.allergy-chip').forEach(c => c.classList.remove('selected'));
+    currentMeal = '아침';
+    showStage('stage-gate');
+  }
+
+  function loadResponses() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch { return []; }
+  }
+  function saveResponses(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+
+  function renderLeader() {
+    const responses = loadResponses();
+    document.getElementById('ls-total').textContent = responses.length;
+    document.getElementById('ls-allergy').textContent = responses.filter(r => !r.allergies.includes('없음') && r.allergies.length > 0).length;
+    document.getElementById('ls-opinion').textContent = responses.filter(r => r.opinion).length;
+    const avgAttempts = responses.length ? (responses.reduce((s, r) => s + r.quizAttempts, 0) / responses.length).toFixed(1) : 0;
+    document.getElementById('ls-quiz').textContent = avgAttempts;
+
+    const rankContent = document.getElementById('ranking-content');
+    if (responses.length === 0) {
+      rankContent.innerHTML = '<div class="empty-msg">아직 응답이 없어요. 학생들이 영의 양식을 떼어먹을 때까지 기다려주세요.</div>';
+    } else {
+      const meals = ['아침', '점심', '저녁', '간식'];
+      rankContent.innerHTML = meals.map(meal => {
+        const counts = {};
+        responses.forEach(r => {
+          const ms = r.menus[meal] || [];
+          ms.forEach(m => { counts[m] = (counts[m] || 0) + 1; });
+        });
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        if (sorted.length === 0) return '';
+        const maxCount = sorted[0][1];
+        return `
+          <div class="meal-section-title">${meal}</div>
+          ${sorted.map(([name, count], i) => `
+            <div class="rank-row">
+              <div class="rank-num ${i === 0 ? 'top' : ''}">${i + 1}</div>
+              <div class="rank-name">${escapeHtml(name)}</div>
+              <div class="rank-bar-wrap"><div class="rank-bar" style="width:${(count / maxCount) * 100}%;"></div></div>
+              <div class="rank-count">${count}표</div>
+            </div>
+          `).join('')}
+        `;
+      }).join('');
+    }
+
+    const alrContent = document.getElementById('allergy-content');
+    const allergyResponders = responses.filter(r => !r.allergies.includes('없음') && r.allergies.length > 0);
+    if (allergyResponders.length === 0) {
+      alrContent.innerHTML = '<div class="empty-msg">알레르기가 있는 학생이 없어요.</div>';
+    } else {
+      alrContent.innerHTML = `<div class="allergy-list">${allergyResponders.map(r => `
+        <div class="allergy-row">
+          <div><div class="nm">${escapeHtml(r.name)} <span class="meta">· ${escapeHtml(r.grade)}</span></div></div>
+          <div class="tags">${r.allergies.map(a => `<span class="tag">${escapeHtml(a)}</span>`).join('')}</div>
+        </div>
+      `).join('')}</div>`;
+    }
+
+    const opContent = document.getElementById('opinions-content');
+    const opResponders = responses.filter(r => r.opinion);
+    if (opResponders.length === 0) {
+      opContent.innerHTML = '<div class="empty-msg">아직 의견이 없어요.</div>';
+    } else {
+      opContent.innerHTML = `<div class="opinions-list">${opResponders.map(r => `
+        <div class="opinion-row">
+          <div class="who">— ${escapeHtml(r.name)} (${escapeHtml(r.grade)})</div>
+          <div class="what">${escapeHtml(r.opinion)}</div>
+        </div>
+      `).join('')}</div>`;
+    }
+  }
+
+  function exportCSV() {
+    const responses = loadResponses();
+    if (responses.length === 0) { showToast('내보낼 데이터가 없어요.'); return; }
+    const header = ['이름', '학년', '아침 추천', '점심 추천', '저녁 추천', '간식 추천', '알레르기', '의견', '퀴즈시도', '제출시간'];
+    const rows = responses.map(r => [
+      r.name, r.grade,
+      (r.menus['아침'] || []).join(', '),
+      (r.menus['점심'] || []).join(', '),
+      (r.menus['저녁'] || []).join(', '),
+      (r.menus['간식'] || []).join(', '),
+      r.allergies.join(', '),
+      r.opinion || '',
+      r.quizAttempts,
+      new Date(r.submittedAt).toLocaleString('ko-KR')
+    ]);
+    const csv = '\uFEFF' + [header, ...rows].map(row =>
+      row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `spiritual_food_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  function clearAll() {
+    if (!confirm('모든 응답 데이터를 삭제합니다. 정말 진행하시겠습니까? (되돌릴 수 없습니다)')) return;
+    if (!confirm('정말 정말 삭제하시겠습니까? 마지막 확인입니다.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    renderLeader();
+    showToast('모든 데이터가 삭제되었습니다.');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeJs(s) {
+    return String(s).replace(/['\\]/g, '\\$&');
+  }
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+</script>
+
+</body>
+</html>
